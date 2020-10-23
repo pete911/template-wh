@@ -1,0 +1,11 @@
+module github.com/pete911/template-wh
+
+go 1.15
+
+require (
+	github.com/mattbaird/jsonpatch v0.0.0-20200820163806-098863c1fc24
+	github.com/stretchr/testify v1.4.0
+	k8s.io/api v0.19.2
+	k8s.io/apimachinery v0.19.2
+	k8s.io/client-go v0.19.2
+)
