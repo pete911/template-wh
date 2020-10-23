@@ -11,7 +11,7 @@ func main() {
 	flags := ParseFlags()
 	log.Printf("starting template admission webhook with flags: %+v", flags)
 
-	values, err := getConfigMapValues(flags.Kubeconfig, flags.ConfigmapNamespace, flags.ConfigmapName)
+	values, err := getConfigMapData(flags.Kubeconfig, flags.ConfigmapNamespace, flags.ConfigmapName)
 	if err != nil {
 		log.Fatalf("get configmap values: %v", err)
 	}
@@ -22,7 +22,7 @@ func main() {
 	log.Fatal(server.ListenAndServeTLS(mutateFn, flags.ServerCertFile, flags.ServerKeyFile))
 }
 
-func getConfigMapValues(kubeconfigPath, namespace, name string) (map[string]string, error) {
+func getConfigMapData(kubeconfigPath, namespace, name string) (map[string]string, error) {
 
 	kubeconfig, err := k8s.LoadKubeconfig(kubeconfigPath)
 	if err != nil {
