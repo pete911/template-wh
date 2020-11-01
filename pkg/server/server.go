@@ -46,5 +46,7 @@ func (m *mutateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(mutated)
+	if _, err := w.Write(mutated); err != nil {
+		log.Printf("cannot write response: %v", err)
+	}
 }

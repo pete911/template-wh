@@ -1,0 +1,10 @@
+apiVersion: v2
+home: https://github.com/pete911/template-wh/e2e
+version: 0.1.0
+name: pod-wh
+description: Test chart for template mutating admission webhook
+sources:
+  - https://github.com/pete911/template-wh/e2e/charts
+maintainers:
+  - name: peter reisinger
+    email: p.reisinger@gmail.com

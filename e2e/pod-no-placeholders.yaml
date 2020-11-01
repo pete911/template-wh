@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-no-placeholders
+  labels:
+    app.kubernetes.io/name: pod-no-placeholders
+spec:
+  containers:
+    - name: "test"
+      image: redis
+  restartPolicy: Never

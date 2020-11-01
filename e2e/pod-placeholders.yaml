@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-placeholders
+  labels:
+    app.kubernetes.io/name: pod-placeholders
+spec:
+  containers:
+    - name: "$cluster"
+      image: redis
+  restartPolicy: Never
