@@ -18,7 +18,7 @@ e2e-test:
 
 build: test
 	$(info *** [go build] ***)
-	go build -mod vendor
+	go build
 .PHONY:build
 
 image:
