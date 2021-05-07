@@ -1,6 +1,6 @@
 module github.com/pete911/template-wh
 
-go 1.15
+go 1.16
 
 require (
 	github.com/mattbaird/jsonpatch v0.0.0-20200820163806-098863c1fc24
