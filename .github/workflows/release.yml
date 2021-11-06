@@ -82,16 +82,23 @@ jobs:
 
       - name: Package and upload helm chart
         run: |
+          # donwload helm chart releaser
           curl -sSLo cr.tar.gz "https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz"
           tar -xzf cr.tar.gz
           rm -f cr.tar.gz
+
+          # package chart
           owner=$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")
           repo=$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")
           ./cr package charts/template-wh
-          ./cr upload --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}"
-          ./cr index --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}" --index-path .cr-index/index.yaml -c https://$owner.github.io/$repo --push
 
-#      - name: Run chart-releaser
-#        uses: helm/chart-releaser-action@v1.2.1
-#        env:
-#          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          # upload chart to github relases
+          ./cr upload --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}"
+          rm -r .cr-release-packages
+
+          # update index and push to github pages
+          git checkout gh-pages
+          ./cr index -i ./index.yaml --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}" -c https://$owner.github.io/$repo
+          git add index.yaml
+          git commit -m "release ${{ env.CHART_VERSION }}"
+          git push origin gh-pages
