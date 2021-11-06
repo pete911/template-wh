@@ -1,41 +1,43 @@
 #!/bin/sh
 TWH_NAME="template-wh"
 TWH_NAMESPACE="kube-system"
-SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+dir=$(dirname "$0")
 
-echo " --- [start minikube] ---"
-minikube start
+echo " --- [start cluster] ---"
+kind create cluster --wait 5m --name template-wh-test
 
-if [ $(kubectl config current-context) != "minikube" ]
+if [ "$(kubectl config current-context)" != "kind-template-wh-test" ]
 then
-  echo "kubectl context is not set to minikube"
+  echo "kubectl context is not set to kind-template-wh-test"
   exit 1
 fi
 
-eval $(minikube -p minikube docker-env)
 # install cert-manager
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.6.1/cert-manager.yaml
+
+# build and load template-wh docker image
+docker build -t pete911/template-wh:test "$dir"/..
+kind load docker-image pete911/template-wh:test --name template-wh-test
 
 # install template-wh chart
-docker build -t pete911/template-wh:test "$SCRIPTPATH"/..
-helm install template-wh "$SCRIPTPATH"/../charts/template-wh \
+helm install template-wh "$dir"/../charts/template-wh \
   --namespace kube-system \
   --set image=pete911/template-wh:test \
   --wait
 
 # install test webhook and configmap
-helm install pod-wh "$SCRIPTPATH"/charts/pod-wh \
+helm install pod-wh "$dir"/charts/pod-wh \
   --namespace kube-system \
   --wait
 
 # run tests
 TEST_RESULT=0
 
-# create pod with placeholder and check if it has been replaced ($cluster -> 'minikube')
-kubectl create -n kube-system -f "$SCRIPTPATH"/pod-placeholders.yaml
+# create pod with placeholder and check if it has been replaced ($cluster -> 'kind-cluster')
+kubectl create -n kube-system -f "$dir"/pod-placeholders.yaml
 CLUSTER_LABEL=$(kubectl get pod -n kube-system -l app.kubernetes.io/name=pod-placeholders -o=jsonpath='{.items[0].spec.containers[0].name}')
 echo "$CLUSTER_LABEL"
-if [ "$CLUSTER_LABEL" = "minikube" ]; then
+if [ "$CLUSTER_LABEL" = "kind-cluster" ]; then
   echo "OK"
 else
   echo "FAIL"
@@ -43,7 +45,7 @@ else
 fi
 
 # create pod without placeholder and check it has not been replaced
-kubectl create -n kube-system -f "$SCRIPTPATH"/pod-no-placeholders.yaml
+kubectl create -n kube-system -f "$dir"/pod-no-placeholders.yaml
 CLUSTER_LABEL=$(kubectl get pod -n kube-system -l app.kubernetes.io/name=pod-no-placeholders -o=jsonpath='{.items[0].spec.containers[0].name}')
 echo "$CLUSTER_LABEL"
 if [ "$CLUSTER_LABEL" = "test" ]; then
@@ -57,4 +59,5 @@ kubectl delete pod -n kube-system -l app.kubernetes.io/name=pod-placeholders
 kubectl delete pod -n kube-system -l app.kubernetes.io/name=pod-no-placeholders
 helm delete pod-wh -n kube-system
 helm delete template-wh -n kube-system
+kind delete cluster --name template-wh-test
 exit "$TEST_RESULT"

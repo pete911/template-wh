@@ -5,4 +5,4 @@ metadata:
   name: template-wh
   namespace: kube-system
 data:
-  cluster: minikube
+  cluster: kind-cluster

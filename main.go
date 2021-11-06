@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/pete911/template-wh/pkg/k8s"
-	"github.com/pete911/template-wh/pkg/server"
+	"github.com/pete911/template-wh/internal/k8s"
+	"github.com/pete911/template-wh/internal/server"
 	"io/ioutil"
 	"log"
 	"os"
