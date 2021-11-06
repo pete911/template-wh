@@ -87,18 +87,27 @@ jobs:
           tar -xzf cr.tar.gz
           rm -f cr.tar.gz
 
-          # package chart
           owner=$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")
           repo=$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")
+
+          # package chart
           ./cr package charts/template-wh
 
           # upload chart to github relases
-          ./cr upload --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}" --release-name-template "{{ .Version }}"
+          ./cr upload \
+              --owner "$owner" \
+              --git-repo "$repo" \
+              --token "${{ secrets.GITHUB_TOKEN }}" \
+              --release-name-template "{{ .Version }}"
 
           # update index and push to github pages
-          git stash
-          git checkout gh-pages
-          ./cr index -i ./index.yaml --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}" -c https://$owner.github.io/$repo
-          git add index.yaml
-          git commit -m "release ${{ env.CHART_VERSION }}"
-          git push
+          git config user.email "$owner@users.noreply.github.com"
+          git config user.name "$owner"
+          ./cr index \
+              --owner "$owner" \
+              --git-repo "$repo" \
+              --token "${{ secrets.GITHUB_TOKEN }}" \
+              --release-name-template "{{ .Version }}" \
+              --index-path ./index.yaml \
+              --charts-repo https://$owner.github.io/$repo \
+              --push
