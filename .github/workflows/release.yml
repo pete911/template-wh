@@ -4,14 +4,34 @@ on:
   push:
     branches:
       - main
-    tags:
-      - '*'
+    paths:
+      - "charts/template-wh/Chart.yaml"
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get helm chart version
+        run: echo "CHART_VERSION=$(grep '^version:' charts/template-wh/Chart.yaml | cut -d ":" -f2 | tr -d ' ')" >> $GITHUB_ENV
+
+      - name: Create tag
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ env.CHART_VERSION }}",
+              sha: context.sha
+            })
+
+      - name: Checkout with the new tag
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -43,17 +63,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v2
-        with:
-          images: ${{ github.repository }}
-
       - name: Build and push template-wh
         uses: docker/build-push-action@v2
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            pete911/template-wh:${{ env.CHART_VERSION }}
+            pete911/template-wh:latest
