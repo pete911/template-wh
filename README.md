@@ -53,3 +53,10 @@ Every request to create a pod that contains `$cluster` placeholder either in `me
 replaced for `minikube`.
 
 This is just example, template-wh can be used on any resource.
+
+## releases
+
+Releases are automated and triggered on [chart version](charts/template-wh/Chart.yaml) update. If there is any change
+to Chart.yaml and the change is on the main branch, this will trigger github action which tags the branch and releases
+[chart](https://pete911.github.io/template-wh/) and
+[docker image](https://hub.docker.com/repository/docker/pete911/template-wh) with this version.
