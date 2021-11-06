@@ -94,11 +94,11 @@ jobs:
 
           # upload chart to github relases
           ./cr upload --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}"
-          rm -r .cr-release-packages
 
           # update index and push to github pages
+          git checkout -- README.md
           git checkout gh-pages
           ./cr index -i ./index.yaml --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}" -c https://$owner.github.io/$repo
           git add index.yaml
           git commit -m "release ${{ env.CHART_VERSION }}"
-          git push origin gh-pages
+          git push
