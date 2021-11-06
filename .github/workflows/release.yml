@@ -74,3 +74,13 @@ jobs:
           tags: |
             pete911/template-wh:${{ env.CHART_VERSION }}
             pete911/template-wh:latest
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.7.0
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.2.1
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
