@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "release"
+      - "charts/template-wh/Chart.yaml"
 
 jobs:
   release:
@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: Get helm chart version
-        run: echo "TWH_VERSION=$(grep '^version:' release | cut -d ":" -f2 | tr -d ' ')" >> $GITHUB_ENV
+        run: echo "CHART_VERSION=$(grep '^version:' charts/template-wh/Chart.yaml | cut -d ":" -f2 | tr -d ' ')" >> $GITHUB_ENV
 
       - name: Create tag
         uses: actions/github-script@v3
@@ -27,7 +27,7 @@ jobs:
             github.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: "refs/tags/${{ env.TWH_VERSION }}",
+              ref: "refs/tags/${{ env.CHART_VERSION }}",
               sha: context.sha
             })
 
@@ -72,7 +72,7 @@ jobs:
 #          platforms: linux/amd64,linux/arm64
 #          push: true
 #          tags: |
-#            pete911/template-wh:${{ env.TWH_VERSION }}
+#            pete911/template-wh:${{ env.CHART_VERSION }}
 #            pete911/template-wh:latest
 
       - name: Install Helm
@@ -80,7 +80,18 @@ jobs:
         with:
           version: v3.7.0
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.2.1
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Package and upload helm chart
+        run: |
+          curl -sSLo cr.tar.gz "https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz"
+          tar -xzf cr.tar.gz
+          rm -f cr.tar.gz
+          owner=$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")
+          repo=$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")
+          ./cr package charts/template-wh
+          ./cr upload --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}"
+          ./cr index --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}" --index-path .cr-index/index.yaml -c https://$owner.github.io/$repo --push
+
+#      - name: Run chart-releaser
+#        uses: helm/chart-releaser-action@v1.2.1
+#        env:
+#          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
