@@ -5,7 +5,7 @@ uses it to replace placeholders (`$key`) in kubernetes manifests.
 ## running template-wh
 
 ### requirements
- - install template-wh either from [helm chart](charts/template-wh) or manually
+ - install template-wh either from [helm chart](https://pete911.github.io/template-wh/) or manually
  - install [cert-manager](https://cert-manager.io/)
 
 ### example configuration
