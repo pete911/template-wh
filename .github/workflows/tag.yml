@@ -8,7 +8,7 @@ on:
       - "charts/template-wh/Chart.yaml"
 
 jobs:
-  release:
+  tag:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
