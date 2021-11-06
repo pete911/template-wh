@@ -93,10 +93,10 @@ jobs:
           ./cr package charts/template-wh
 
           # upload chart to github relases
-          ./cr upload --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}"
+          ./cr upload --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}" --release-name-template "{{ .Version }}"
 
           # update index and push to github pages
-          git checkout -- README.md
+          git stash
           git checkout gh-pages
           ./cr index -i ./index.yaml --owner "$owner" --git-repo "$repo" --token "${{ secrets.GITHUB_TOKEN }}" -c https://$owner.github.io/$repo
           git add index.yaml

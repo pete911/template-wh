@@ -1,6 +1,6 @@
 apiVersion: v2
 home: https://github.com/pete911/template-wh
-version: 0.17.0
+version: 0.1.0
 name: template-wh
 description: Template mutating admission webhook
 sources:

@@ -1,2 +1,4 @@
 /template-wh
+# chart releaser
 .cr-release-packages
+.cr-index
