@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.com/pete911/template-wh.svg?branch=main)](https://travis-ci.com/pete911/template-wh)
-
 # template-wh
 Kubernetes template mutating admission webhook. This is generic webhook, that takes configmap with key value pairs and
 uses it to replace placeholders (`$key`) in kubernetes manifests.
