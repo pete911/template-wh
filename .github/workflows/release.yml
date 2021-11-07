@@ -71,32 +71,36 @@ jobs:
         with:
           version: v3.7.0
 
-      - name: Package and upload helm chart
+      - name: Download chart releaser
         run: |
-          # donwload helm chart releaser
           curl -sSLo cr.tar.gz "https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz"
           tar -xzf cr.tar.gz
           rm -f cr.tar.gz
-
-          owner=$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")
-          repo=$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")
-
-          # package chart
-          ./cr package charts/$repo
-
-          # upload chart to github relases
+      -
+        name: Set owner and repo env vars
+        run: |
+          echo "GH_OWNER=$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")" >> $GITHUB_ENV
+          echo "GH_REPO=$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")" >> $GITHUB_ENV
+      -
+        name: Package chart
+        run: |
+          ./cr package charts/${{ env.GH_REPO }}
+      -
+        name: Upload chart
+        run: |
           ./cr upload \
-              --owner "$owner" \
-              --git-repo "$repo" \
+              --owner ${{ env.GH_OWNER }} \
+              --git-repo ${{ env.GH_REPO }} \
               --token "${{ secrets.GITHUB_TOKEN }}" \
-              --release-name-template "{{ .Version }}"
-
-          # update index and push to github pages
-          git config user.email "$owner@users.noreply.github.com"
-          git config user.name "$owner"
+              --release-name-template "{{ .Version }}" \
+      -
+        name: Update chart index
+        run: |
+          git config user.email "${{ env.GH_OWNER }}@users.noreply.github.com"
+          git config user.name "${{ env.GH_OWNER }}"
           ./cr index \
-              --owner "$owner" \
-              --git-repo "$repo" \
+              --owner ${{ env.GH_OWNER }} \
+              --git-repo ${{ env.GH_REPO }} \
               --token "${{ secrets.GITHUB_TOKEN }}" \
               --release-name-template "{{ .Version }}" \
               --index-path ./index.yaml \
