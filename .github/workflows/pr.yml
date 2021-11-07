@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  release:
+  e2e-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,3 +37,26 @@ jobs:
       - name: Run e2e-tests
         run: |
           make e2e-test
+
+  docker-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -t $GITHUB_REPOSITORY:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '$GITHUB_REPOSITORY:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
