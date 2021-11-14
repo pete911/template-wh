@@ -103,6 +103,5 @@ jobs:
               --git-repo ${{ env.GH_REPO }} \
               --token "${{ secrets.GITHUB_TOKEN }}" \
               --release-name-template "{{ .Version }}" \
-              --index-path ./index.yaml \
-              --charts-repo https://$owner.github.io/$repo \
+              --charts-repo https://raw.githubusercontent.com/${{ env.GH_OWNER }}/${{ env.GH_REPO }}/gh-pages/index.yaml
               --push
