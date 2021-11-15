@@ -2,6 +2,20 @@ apiVersion: v1
 entries:
   template-wh:
   - apiVersion: v2
+    created: "2021-11-15T21:42:05.887083187Z"
+    description: Template mutating admission webhook
+    digest: 9161c6b5a94a38c6c941682b6ccd63658222af7940da34df058bc924a4244404
+    home: https://github.com/pete911/template-wh
+    maintainers:
+    - email: p.reisinger@gmail.com
+      name: peter reisinger
+    name: template-wh
+    sources:
+    - https://github.com/pete911/template-wh/charts
+    urls:
+    - https://github.com/pete911/template-wh/releases/download/0.7.0/template-wh-0.7.0.tgz
+    version: 0.7.0
+  - apiVersion: v2
     created: "2021-11-14T15:00:35.299215369Z"
     description: Template mutating admission webhook
     digest: 3b559681d391ad22c72aadb5a2efd0b923bf2c03b0a4920206ee839d99effa63
@@ -15,4 +29,4 @@ entries:
     urls:
     - https://github.com/pete911/template-wh/releases/download/0.6.0/template-wh-0.6.0.tgz
     version: 0.6.0
-generated: "2021-11-14T15:00:35.299230069Z"
+generated: "2021-11-15T21:42:05.887091187Z"
