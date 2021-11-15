@@ -104,5 +104,5 @@ jobs:
               --token "${{ secrets.GITHUB_TOKEN }}" \
               --release-name-template "{{ .Version }}" \
               --index-path ./index.yaml \
-              --charts-repo https://raw.githubusercontent.com/${{ env.GH_OWNER }}/${{ env.GH_REPO }}/gh-pages/index.yaml \
+              --charts-repo https://raw.githubusercontent.com/${{ env.GH_OWNER }}/${{ env.GH_REPO }}/gh-pages \
               --push
