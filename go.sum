@@ -606,8 +606,8 @@ honnef.co/go/tools v0.0.1-2020.1.4/go.mod h1:X/FiERA/W4tHapMX5mGpAtMSVEeEUOyHaw9
 k8s.io/api v0.23.6 h1:yOK34wbYECH4RsJbQ9sfkFK3O7f/DUHRlzFehkqZyVw=
 k8s.io/api v0.23.6/go.mod h1:1kFaYxGCFHYp3qd6a85DAj/yW8aVD6XLZMqJclkoi9g=
 k8s.io/apimachinery v0.23.6/go.mod h1:BEuFMMBaIbcOqVIJqNZJXGFTP4W6AycEpb5+m/97hrM=
-k8s.io/apimachinery v0.24.0 h1:ydFCyC/DjCvFCHK5OPMKBlxayQytB8pxy8YQInd5UyQ=
-k8s.io/apimachinery v0.24.0/go.mod h1:82Bi4sCzVBdpYjyI4jY6aHX+YCUchUIrZrXKedjd2UM=
+k8s.io/apimachinery v0.24.1 h1:ShD4aDxTQKN5zNf8K1RQ2u98ELLdIW7jEnlO9uAMX/I=
+k8s.io/apimachinery v0.24.1/go.mod h1:82Bi4sCzVBdpYjyI4jY6aHX+YCUchUIrZrXKedjd2UM=
 k8s.io/client-go v0.23.6 h1:7h4SctDVQAQbkHQnR4Kzi7EyUyvla5G1pFWf4+Od7hQ=
 k8s.io/client-go v0.23.6/go.mod h1:Umt5icFOMLV/+qbtZ3PR0D+JA6lvvb3syzodv4irpK4=
 k8s.io/gengo v0.0.0-20210813121822-485abfe95c7c/go.mod h1:FiNAH4ZV3gBg2Kwh89tzAEV2be7d5xI0vBa/VySYy3E=
