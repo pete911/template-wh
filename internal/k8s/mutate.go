@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-// this is needed so we don't replace values in metadata["managedFields"] and so on
+// Manifest is needed so we don't replace values in metadata["managedFields"] and so on
 type Manifest struct {
 	Metadata Metadata        `json:"metadata,omitempty"`
 	Spec     json.RawMessage `json:"spec,omitempty"`
@@ -28,7 +28,7 @@ type Metadata struct {
 	ClusterName string            `json:"clusterName,omitempty"`
 }
 
-// Takes AdmissionReview and replaces AdmissionReview.Request $var with supplied values
+// Mutate takes AdmissionReview and replaces AdmissionReview.Request $var with supplied values
 // (although this can replace ${var} as well, it won't play nicely with json payload)
 func Mutate(body []byte, values map[string]string) ([]byte, error) {
 
@@ -105,9 +105,9 @@ func getAdmissionResponse(admissionRequestUID types.UID, patch []byte) *admissio
 
 	patchTypeJson := admission.PatchTypeJSONPatch
 	var admissionResponse = &admission.AdmissionResponse{
-		Allowed:          true,
-		UID:              admissionRequestUID,
-		Patch:            patch,
+		Allowed: true,
+		UID:     admissionRequestUID,
+		Patch:   patch,
 		Result: &meta.Status{
 			Status: "Success",
 		},

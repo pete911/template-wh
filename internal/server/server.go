@@ -1,7 +1,7 @@
 package server
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -30,7 +30,7 @@ type mutateHandler struct {
 
 func (m *mutateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		log.Printf("cannot read body: %v", err)
