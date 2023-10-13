@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"github.com/pete911/template-wh/internal/k8s"
 	"github.com/pete911/template-wh/internal/server"
-	"io/ioutil"
-	"log"
+	"log/slog"
+	"net/http"
 	"os"
 	"path/filepath"
 )
@@ -18,7 +20,8 @@ func init() {
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatalf("get user home dir: %v", err)
+		slog.Error(fmt.Sprintf("get user home dir: %v", err))
+		os.Exit(1)
 	}
 	tlsCertFile = filepath.Join(homeDir, "tls.crt")
 	tlsKeyFile = filepath.Join(homeDir, "tls.key")
@@ -28,15 +31,18 @@ func main() {
 
 	flags, err := ParseFlags()
 	if err != nil {
-		log.Fatalf("parse flags: %v", err)
+		slog.Error(fmt.Sprintf("parse flags: %v", err))
+		os.Exit(1)
 	}
-	log.Printf("starting template admission webhook with flags: %s", flags)
+	slog.Info(fmt.Sprintf("starting template admission webhook with flags: %s", flags))
 
-	if err := ioutil.WriteFile(tlsCertFile, []byte(flags.TLSCrt), 0640); err != nil {
-		log.Fatalf("write tls.crt: %v", err)
+	if err := os.WriteFile(tlsCertFile, []byte(flags.TLSCrt), 0640); err != nil {
+		slog.Error(fmt.Sprintf("write tls.crt: %v", err))
+		os.Exit(1)
 	}
-	if err := ioutil.WriteFile(tlsKeyFile, []byte(flags.TLSKey), 0600); err != nil {
-		log.Fatalf("write tls.key: %v", err)
+	if err := os.WriteFile(tlsKeyFile, []byte(flags.TLSKey), 0600); err != nil {
+		slog.Error(fmt.Sprintf("write tls.key: %v", err))
+		os.Exit(1)
 	}
 
 	k8sClient := getK8sClient(flags.Kubeconfig)
@@ -44,24 +50,31 @@ func main() {
 		values := getValues(k8sClient, flags.ConfigmapNamespace, flags.ConfigmapName)
 		return k8s.Mutate(body, values)
 	}
-	log.Fatal(server.ListenAndServeTLS(mutateFn, tlsCertFile, tlsKeyFile))
+
+	if err := server.ListenAndServeTLS(mutateFn, tlsCertFile, tlsKeyFile); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+	slog.Info("server closed")
 }
 
 func getValues(k8sClient k8s.Client, namespace, name string) map[string]string {
 
 	values, err := k8sClient.GetConfigMapData(namespace, name)
 	if err != nil {
-		log.Fatalf("get configmap values: %v", err)
+		slog.Error(fmt.Sprintf("get configmap values: %v", err))
+		os.Exit(1)
 	}
 	return values
 }
 
 func getK8sClient(kubeconfigPath string) k8s.Client {
 
-	log.Print("loading kubeconfig")
+	slog.Info("loading kubeconfig")
 	kubeconfig, err := k8s.LoadKubeconfig(kubeconfigPath)
 	if err != nil {
-		log.Fatalf("get kubeconfig: %v", err)
+		slog.Error(fmt.Sprintf("get kubeconfig: %v", err))
+		os.Exit(1)
 	}
 	return k8s.NewClient(kubeconfig.Clientset)
 }

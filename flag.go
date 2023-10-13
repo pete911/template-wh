@@ -34,7 +34,9 @@ func ParseFlags() (Flags, error) {
 		"tls certificate to be used by this service")
 	tlsKey := f.String("tls-key", getStringEnv("TWH_TLS_KEY", ""),
 		"tls key to be used by this service")
-	f.Parse(os.Args[1:])
+	if err := f.Parse(os.Args[1:]); err != nil {
+		return Flags{}, fmt.Errorf("parse args: %w", err)
+	}
 
 	flags := Flags{
 		Kubeconfig:         stringValue(kubeconfig),

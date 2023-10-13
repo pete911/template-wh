@@ -8,12 +8,12 @@ import (
 	admission "k8s.io/api/admission/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"log"
+	"log/slog"
 	"os"
 	"strings"
 )
 
-// Manifest is needed so we don't replace values in metadata["managedFields"] and so on
+// Manifest is needed, so we don't replace values in metadata["managedFields"] and so on
 type Manifest struct {
 	Metadata Metadata        `json:"metadata,omitempty"`
 	Spec     json.RawMessage `json:"spec,omitempty"`
@@ -61,17 +61,17 @@ func Mutate(body []byte, values map[string]string) ([]byte, error) {
 
 func getPatch(manifest Manifest, values map[string]string) ([]byte, error) {
 
-	old, err := json.Marshal(manifest)
+	oldObj, err := json.Marshal(manifest)
 	if err != nil {
 		return nil, fmt.Errorf("marshal manifest: %v", err)
 	}
-	new, err := json.Marshal(manifest)
+	newObj, err := json.Marshal(manifest)
 	if err != nil {
 		return nil, fmt.Errorf("marshal manifest: %v", err)
 	}
 
-	new = expand(new, values)
-	return createPatch(old, new)
+	newObj = expand(newObj, values)
+	return createPatch(oldObj, newObj)
 }
 
 // Expand replaces ${var} or $var in the request with passed values
@@ -115,7 +115,7 @@ func getAdmissionResponse(admissionRequestUID types.UID, patch []byte) *admissio
 
 	// patch type can be set only if there is actual patch
 	if patch != nil {
-		log.Printf("patch: %+v", string(patch))
+		slog.Info(fmt.Sprintf("patch: %+v", string(patch)))
 		admissionResponse.AuditAnnotations = map[string]string{"mutated": "template-wh"}
 		admissionResponse.PatchType = &patchTypeJson
 	}

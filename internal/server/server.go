@@ -1,8 +1,9 @@
 package server
 
 import (
+	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -33,20 +34,20 @@ func (m *mutateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		log.Printf("cannot read body: %v", err)
+		slog.Error(fmt.Sprintf("cannot read body: %v", err))
 		http.Error(w, "500 internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	mutated, err := m.mutateFn(body)
 	if err != nil {
-		log.Printf("cannot mutate request: %v", err)
+		slog.Error(fmt.Sprintf("cannot mutate request: %v", err))
 		http.Error(w, "500 internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(mutated); err != nil {
-		log.Printf("cannot write response: %v", err)
+		slog.Error(fmt.Sprintf("cannot write response: %v", err))
 	}
 }

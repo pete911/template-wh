@@ -2,10 +2,10 @@ package k8s
 
 import (
 	"errors"
-	"io/ioutil"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"os"
 )
 
 type Kubeconfig struct {
@@ -41,7 +41,7 @@ func LoadKubeconfig(kubeconfigPath string) (Kubeconfig, error) {
 func getCA(tls rest.TLSClientConfig) ([]byte, error) {
 
 	if tls.CAFile != "" {
-		return ioutil.ReadFile(tls.CAFile)
+		return os.ReadFile(tls.CAFile)
 	}
 	if len(tls.CAData) != 0 {
 		return tls.CAData, nil

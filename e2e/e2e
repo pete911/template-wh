@@ -1,6 +1,4 @@
 #!/bin/sh
-TWH_NAME="template-wh"
-TWH_NAMESPACE="kube-system"
 dir=$(dirname "$0")
 
 echo " --- [start cluster] ---"
@@ -13,7 +11,7 @@ then
 fi
 
 # install cert-manager
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.6.1/cert-manager.yaml
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.13.1/cert-manager.yaml
 
 # build and load template-wh docker image
 docker build -t pete911/template-wh:test "$dir"/..
