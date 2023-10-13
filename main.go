@@ -45,9 +45,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	k8sClient := getK8sClient(flags.Kubeconfig)
+	slog.Info("loading kubeconfig")
+	kubeconfig, err := k8s.LoadKubeconfig(flags.Kubeconfig)
+	if err != nil {
+		slog.Error(fmt.Sprintf("load kubeconfig: %v", err))
+		os.Exit(1)
+	}
+
 	var mutateFn = func(body []byte) ([]byte, error) {
-		values := getValues(k8sClient, flags.ConfigmapNamespace, flags.ConfigmapName)
+		values, err := k8s.GetConfigMapData(kubeconfig.Clientset, flags.ConfigmapNamespace, flags.ConfigmapName)
+		if err != nil {
+			return nil, err
+		}
 		return k8s.Mutate(body, values)
 	}
 
@@ -56,25 +65,4 @@ func main() {
 		os.Exit(1)
 	}
 	slog.Info("server closed")
-}
-
-func getValues(k8sClient k8s.Client, namespace, name string) map[string]string {
-
-	values, err := k8sClient.GetConfigMapData(namespace, name)
-	if err != nil {
-		slog.Error(fmt.Sprintf("get configmap values: %v", err))
-		os.Exit(1)
-	}
-	return values
-}
-
-func getK8sClient(kubeconfigPath string) k8s.Client {
-
-	slog.Info("loading kubeconfig")
-	kubeconfig, err := k8s.LoadKubeconfig(kubeconfigPath)
-	if err != nil {
-		slog.Error(fmt.Sprintf("get kubeconfig: %v", err))
-		os.Exit(1)
-	}
-	return k8s.NewClient(kubeconfig.Clientset)
 }
