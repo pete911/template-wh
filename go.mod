@@ -5,8 +5,8 @@ go 1.21
 require (
 	github.com/mattbaird/jsonpatch v0.0.0-20230413205102-771768614e91
 	github.com/stretchr/testify v1.8.4
-	k8s.io/api v0.28.3
-	k8s.io/apimachinery v0.28.3
+	k8s.io/api v0.28.4
+	k8s.io/apimachinery v0.28.4
 	k8s.io/client-go v0.28.3
 )
 
